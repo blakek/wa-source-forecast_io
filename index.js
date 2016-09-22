@@ -2,10 +2,11 @@ var simpleRequest = require('./lib/simpleRequest');
 
 // The main object that is visible to other modules
 var forecast_io = {
-	source: {
+	info: {
 		id: 'forecast_io', // What we use to identify this source (required)
 		name: 'Forecast.io', // Human-readable name of the source (required)
 		enabled: true, // Should this be shown as an option to users (requred for now)
+		needs_api_key: true, // Does this package want an API key to work?
 		source_site: 'http://forecast.io/', // Website of source for info (optional)
 		last_call: undefined // Last time this source was called. Used for caching request results (esp. to keep from using up free API keys)
 	},
@@ -69,15 +70,15 @@ function forecastio2wa(result_string, cb) {
 			latitude: result_object.latitude,
 			longitude: result_object.longitude
 		},
+		nearest_storm: {
+			bearing: result_object.currently.nearestStormBearing || 0,
+			distance: result_object.currently.nearestStormDistance || 0
+		},
 		now: {
 			temp: Math.round(result_object.currently.temperature),
 			temp_apparent: Math.round(result_object.currently.apparentTemperature),
 			conditions: result_object.currently.summary,
 			icon: forecast_io2waIcon(result_object.currently.icon),
-			nearest_storm: {
-				bearing: result_object.currently.nearestStormBearing || 0,
-				distance: result_object.currently.nearestStormDistance || 0
-			},
 			precipitation: {
 				intensity: result_object.currently.precipIntensity,
 				probability: Math.round(result_object.currently.precipProbability * 100),
